@@ -1,0 +1,149 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Waybound Riders Login</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        body {
+            background: #ffffff;
+            font-family: Arial, sans-serif;
+        }
+
+        .main-title {
+            font-family: Georgia, 'Times New Roman', serif;
+            color: #1f4a75;
+            letter-spacing: 0.5px;
+        }
+
+        .welcome-title {
+            font-family: 'Comic Sans MS', 'Segoe Print', cursive;
+            color: #222;
+            font-size: 1.5rem;
+        }
+
+        .profile-img {
+            width: 120px;
+            height: 120px;
+            object-fit: cover;
+        }
+
+        .form-control {
+            border-radius: 18px;
+            padding-top: 12px;
+            padding-bottom: 12px;
+        }
+
+        .form-control:focus {
+            border-color: #1f4a75;
+            box-shadow: 0 0 0 0.15rem rgba(31, 74, 117, 0.2);
+        }
+
+        .login-btn {
+            width: 60%;
+            height: 50px;
+            font-size: 20px;
+            font-weight: 600;
+            border-radius: 18px;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-2px);
+            transition: 0.3s;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container-fluid min-vh-100 d-flex align-items-start justify-content-center py-4">
+    <div class="w-100" style="max-width: 360px;">
+
+        <div class="text-center mb-4">
+            @if(this.message()!=''){
+                <div #messageBox class="alert alert-info d-flex align-items-center justify-content-between py-2 px-3 mb-3" role="alert" id="lbl">
+                    <span>{{this.message()}}</span>
+                    <button type="button" class="btn-close ms-3" aria-label="Close" (click)="this.message.set('')"></button>
+                </div>
+            }
+            <h1 class="display-6 mb-4 main-title">
+                Live the Journey
+            </h1>
+
+            <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=300&q=80"
+                 alt="Profile"
+                 class="rounded-circle shadow-sm profile-img">
+
+            <h2 class="mt-4 mb-2 welcome-title">
+                Welcome Back Rider
+            </h2>
+
+            <p class="text-muted small">
+                Sign in to continue your journey
+            </p>
+
+        </div>
+
+        <form [formGroup]="frm1" (submit)="frmSubmit()">
+
+            <div class="mb-3">
+                <input type="email"
+                       class="form-control form-control-lg text-center"
+                       placeholder="Email Address" formControlName="riderEmail">
+            </div>
+
+            <div class="mb-3">
+                <input type="password"
+                       class="form-control form-control-lg text-center"
+                       placeholder="Password" formControlName="riderPassword">
+            </div>
+
+            <div class="text-end mb-4">
+                <a href="#" class="small text-primary text-decoration-none">
+                    Forgot Password?
+                </a>
+            </div>
+
+            <div class="text-center mb-4">
+                <button type="submit" class="btn btn-warning login-btn">
+                    @if(this.btnState()==true){
+                        <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                        Loading...
+                    } @else {
+                        Login
+                    }
+                </button>
+            </div>
+
+            <div class="form-check mb-3">
+                <input class="form-check-input" type="checkbox" id="rememberMe">
+                <label class="form-check-label small" for="rememberMe">
+                    Remember me
+                </label>
+            </div>
+
+            <div class="text-center">
+                <p class="small mb-2">
+                    Don't have an account?
+                    <a href="/register" class="text-primary text-decoration-none">
+                        Register
+                    </a>
+                </p>
+
+                <a href="#" class="small text-primary text-decoration-none">
+                    Terms &amp; Conditions
+                </a>
+            </div>
+
+        </form>
+
+    </div>
+</div>
+
+</body>
+</html>
+

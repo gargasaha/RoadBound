@@ -1,0 +1,189 @@
+    <style>
+        body {
+                background: linear-gradient(135deg, #f8fbff 0%, #eef5ff 100%);
+                font-family: 'Segoe UI', Arial, sans-serif;
+                color: #1f2d3d;
+        }
+
+            .page-wrap {
+                padding: 2rem 1rem;
+            }
+
+            .form-card {
+                background: #ffffff;
+                border: 1px solid #e6edf7;
+                border-radius: 24px;
+                box-shadow: 0 12px 30px rgba(31, 74, 117, 0.08);
+                padding: 2rem;
+            }
+
+        .main-title {
+            font-family: Georgia, 'Times New Roman', serif;
+            color: #1f4a75;
+                letter-spacing: 0.5px;
+                font-weight: 700;
+        }
+
+        .form-control {
+            border-radius: 18px;
+            padding-top: 12px;
+            padding-bottom: 12px;
+                border: 1px solid #d7e3f4;
+                background: #fbfdff;
+        }
+
+        .form-control:focus {
+            border-color: #1f4a75;
+            box-shadow: 0 0 0 0.15rem rgba(31, 74, 117, 0.2);
+                background: #ffffff;
+        }
+
+        .submit-btn {
+            width: 100%;
+            height: 50px;
+            font-size: 18px;
+            font-weight: 600;
+            border-radius: 18px;
+                border: none;
+                background: linear-gradient(135deg, #ffcf5a 0%, #ffb938 100%);
+                color: #2d2100;
+                box-shadow: 0 8px 18px rgba(255, 185, 56, 0.35);
+                transition: transform 0.25s ease, box-shadow 0.25s ease;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+                box-shadow: 0 12px 22px rgba(255, 185, 56, 0.45);
+        }
+
+        .form-label {
+            color: #1f4a75;
+                font-weight: 600;
+            margin-bottom: 0.75rem;
+        }
+
+            .text-muted {
+                color: #5d7087 !important;
+            }
+
+            .alert-info {
+                border: 1px solid #cde0f8;
+                background: #eef6ff;
+                color: #1f4a75;
+                border-radius: 14px;
+            }
+
+            .error-label {
+                color: #cf2d2d;
+                font-size: 0.9rem;
+                font-weight: 500;
+                display: inline-block;
+                margin-bottom: 0.5rem;
+            }
+
+        .image-preview {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 12px;
+            margin-top: 0.5rem;
+                border: 1px solid #d7e3f4;
+                box-shadow: 0 8px 16px rgba(31, 74, 117, 0.12);
+            }
+
+            @media (max-width: 576px) {
+                .form-card {
+                    padding: 1.25rem;
+                    border-radius: 18px;
+                }
+
+                .submit-btn {
+                    height: 46px;
+                    font-size: 16px;
+                }
+        }
+    </style>
+
+
+    <div class="container-fluid min-vh-100 d-flex align-items-center justify-content-center page-wrap">
+    <div class="w-100" style="max-width: 600px;">
+            <div class="form-card">
+
+        <div class="text-center mb-5">
+            @if(this.message()!=''){
+                <div #messageBox class="alert alert-info d-flex align-items-center justify-content-between py-2 px-3 mb-3" role="alert" id="lbl">
+                    <span>{{this.message()}}</span>
+                    <button type="button" class="btn-close ms-3" aria-label="Close" (click)="this.message.set('')"></button>
+                </div>
+            }
+            <h1 class="display-6 mb-2 main-title">
+                Create Community
+            </h1>
+            <p class="text-muted">
+                Build your rider community
+            </p>
+        </div>
+
+        <form [formGroup]="frm1" (submit)="frmSubmit()">
+
+            <div class="row">
+                <!-- Community Name Column -->
+                <div class="col-md-6 mb-4">
+                    @if(this.frm1.get("communityName")?.touched && this.frm1.value.communityName==""){
+                        <label class="error-label">Community name is mandatory</label>
+                    }
+                    <label for="communityName" class="form-label">Community Name*</label>
+                    <input type="text"
+                           class="form-control form-control-lg"
+                           id="communityName"
+                           placeholder="Enter community name"
+                           formControlName="communityName">
+                    
+                </div>
+
+                <!-- Community Image Column -->
+                <div class="col-md-6 mb-4">
+                    <label for="communityImage" class="form-label">Community Image*</label>
+                    <input type="file"
+                           class="form-control form-control-lg"
+                           id="communityImage"
+                           accept="image/*"
+                           formControlName="communityImage"
+                           (change)="onImageSelected($event)">
+                    @if(this.imagePreview()){
+                        <img [src]="this.imagePreview()" alt="Community Image" class="image-preview">
+                    }
+                </div>
+            </div>
+
+            <!-- Community Bio -->
+            <div class="mb-4">
+                @if(this.frm1.get("communityBio")?.touched && this.frm1.value.communityBio==""){
+                    <label class="error-label">Community bio is mandatory</label>
+                }
+                <label for="communityBio" class="form-label">Community Bio*</label>
+                <textarea class="form-control form-control-lg"
+                          id="communityBio"
+                          rows="4"
+                          placeholder="Enter community bio and description"
+                          formControlName="communityBio"></textarea>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="text-center mb-4">
+                <button type="submit" class="btn btn-warning submit-btn">
+                    @if(this.btnState()==true){
+                        <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                        Creating...
+                    } @else {
+                        Create Community
+                    }
+                </button>
+            </div>
+
+        </form>
+
+        </div>
+
+    </div>
+</div>

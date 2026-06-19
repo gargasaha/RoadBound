@@ -1,0 +1,416 @@
+<div class="search-wrap">
+	<span class="search-icon">🔍</span>
+	<input type="search" class="search-input" placeholder="Search communities..." />
+</div>
+@if(qrState()==false && joinState()==false){
+<div class="communities-grid">
+	@for (c of this.communities(); track $index) {
+	<div class="community-card">
+		<div class="community-image-wrap">
+			<img [src]="c.communityImage" alt="{{c.communityName}}">
+		</div>
+		<div class="community-info">
+			<p class="community-name">{{c.communityName}}</p>
+		</div>
+		<div>
+			<button class="qr-btn" type="button" (click)="setQr(c._id)">
+				<img class="qr-btn-icon" src="https://api.qrserver.com/v1/create-qr-code/?size=80x80&data=RoadBound"
+					alt="QR sample image">
+				<span>Show QR</span>
+			</button>
+		</div>
+	</div>
+	}
+</div>
+}
+
+@if(qrState()){
+<div class="qr-backdrop" (click)="qrState.set(false)"></div>
+<div class="qr-modal">
+	<div class="qr-card">
+		<div class="qr-header">
+			<div>
+				<p class="qr-title">Community QR Code</p>
+				<p class="qr-subtitle">Scan to join this community</p>
+			</div>
+			<button class="qr-close" type="button" (click)="qrState.set(false)">×</button>
+		</div>
+		<div class="qr-preview">
+			<qrcode [qrdata]="qr()" [width]="256"></qrcode>
+		</div>
+		<div class="qr-footer">
+			<span class="qr-hint">Point your camera at the code</span>
+		</div>
+	</div>
+	
+</div>
+}
+@if (joinState()) {
+	<div class="join-backdrop" (click)="stopJoin()"></div>
+	<div class="join-modal">
+		<div class="join-card">
+			<div class="join-header">
+				<div>
+					<p class="join-title">Join Community</p>
+					<p class="join-subtitle">Scan a community QR code to join</p>
+				</div>
+				<button class="join-close" type="button" (click)="stopJoin()">×</button>
+			</div>
+
+			<div class="join-body">
+				<button class="scan-btn" type="button" (click)="startScanner()">Start Scanner</button>
+				<div id="reader" class="scanner-area"></div>
+				<div class="scanned-text">{{ scannedData() || 'No QR code scanned yet' }}</div>
+			</div>
+		</div>
+	</div>
+}
+<style>
+	.join-modal {
+		position: fixed;
+		inset: 0;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		padding: 24px;
+		z-index: 2000;
+	}
+
+	.join-card {
+		position: relative;
+		z-index: 2001;
+		width: min(100%, 420px);
+		background: linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(248, 250, 252, 0.98) 100%);
+		border: 1px solid rgba(255, 255, 255, 0.75);
+		border-radius: 28px;
+		padding: 24px;
+		box-shadow: 0 28px 90px rgba(15, 23, 42, 0.26);
+		backdrop-filter: blur(12px);
+	}
+
+	.join-header {
+		display: flex;
+		align-items: flex-start;
+		justify-content: space-between;
+		gap: 16px;
+		margin-bottom: 18px;
+	}
+
+	.join-title {
+		margin: 0;
+		font-size: 20px;
+		font-weight: 800;
+		color: #0f172a;
+	}
+
+	.join-subtitle {
+		margin: 6px 0 0;
+		font-size: 13px;
+		color: #64748b;
+	}
+
+	.join-close {
+		width: 38px;
+		height: 38px;
+		border: none;
+		border-radius: 999px;
+		background: #eff6ff;
+		color: #1d4ed8;
+		font-size: 24px;
+		font-weight: 700;
+		line-height: 1;
+		cursor: pointer;
+		flex-shrink: 0;
+		transition: transform 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
+	}
+
+	.join-close:hover {
+		transform: scale(1.05);
+		background: #dbeafe;
+		box-shadow: 0 8px 20px rgba(37, 99, 235, 0.16);
+	}
+
+	.join-body {
+		display: flex;
+		flex-direction: column;
+		gap: 16px;
+	}
+
+	.scan-btn {
+		width: 100%;
+		padding: 12px 16px;
+		border: none;
+		border-radius: 14px;
+		background: linear-gradient(135deg, #f59e0b 0%, #fb7185 100%);
+		color: #fff;
+		font-size: 15px;
+		font-weight: 700;
+		cursor: pointer;
+		box-shadow: 0 12px 24px rgba(245, 158, 11, 0.28);
+		transition: transform 0.15s ease, box-shadow 0.15s ease;
+	}
+
+	.scan-btn:hover {
+		transform: translateY(-1px);
+		box-shadow: 0 16px 30px rgba(245, 158, 11, 0.34);
+	}
+
+	.scan-btn:active {
+		transform: translateY(0);
+	}
+
+	.scanner-area {
+		min-height: 260px;
+		border-radius: 20px;
+		overflow: hidden;
+		border: 1px dashed #cbd5e1;
+		background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+		box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
+	}
+
+	.scanned-text {
+		padding: 14px 16px;
+		border-radius: 14px;
+		background: #f8fafc;
+		border: 1px solid #e2e8f0;
+		color: #334155;
+		font-size: 13px;
+		word-break: break-word;
+	}
+
+	.join-backdrop {
+		position: fixed;
+		inset: 0;
+		background: rgba(15, 23, 42, 0.58);
+		backdrop-filter: blur(6px);
+		z-index: 1999;
+	}
+</style>
+<style>
+	.qr-modal {
+		position: fixed;
+		inset: 0;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		padding: 24px;
+		z-index: 2000;
+	}
+
+	.qr-card {
+		position: relative;
+		z-index: 2001;
+		width: min(100%, 360px);
+		background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+		border: 1px solid rgba(255, 255, 255, 0.7);
+		border-radius: 24px;
+		padding: 22px;
+		box-shadow: 0 24px 80px rgba(15, 23, 42, 0.24);
+		backdrop-filter: blur(10px);
+	}
+
+	.qr-preview {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		padding: 18px;
+		background: #fff;
+		border-radius: 20px;
+		box-shadow: inset 0 0 0 1px #e5e7eb;
+	}
+
+	.qr-header {
+		display: flex;
+		align-items: flex-start;
+		justify-content: space-between;
+		gap: 16px;
+		margin-bottom: 16px;
+	}
+
+	.qr-title {
+		margin: 0;
+		font-size: 18px;
+		font-weight: 700;
+		color: #111827;
+	}
+
+	.qr-subtitle {
+		margin: 4px 0 0;
+		font-size: 13px;
+		color: #6b7280;
+	}
+
+	.qr-close {
+		width: 36px;
+		height: 36px;
+		border: none;
+		border-radius: 50%;
+		background: #eef2ff;
+		color: #3730a3;
+		font-size: 22px;
+		font-weight: 700;
+		line-height: 1;
+		cursor: pointer;
+		flex-shrink: 0;
+		transition: transform 0.15s ease, background 0.15s ease;
+	}
+
+	.qr-close:hover {
+		transform: scale(1.05);
+		background: #e0e7ff;
+	}
+
+	.qr-backdrop {
+		position: fixed;
+		inset: 0;
+		background: rgba(15, 23, 42, 0.58);
+		backdrop-filter: blur(6px);
+		z-index: 1999;
+	}
+
+	.qr-footer {
+		margin-top: 14px;
+		text-align: center;
+	}
+
+	.qr-hint {
+		font-size: 13px;
+		color: #6b7280;
+	}
+
+	.communities-grid {
+		display: flex;
+		flex-direction: column;
+		gap: 16px;
+		padding: 16px;
+		margin-bottom: 100px;
+		height: calc(100vh - 120px);
+		overflow-y: auto;
+		overflow-x: hidden;
+		box-sizing: border-box;
+	}
+
+	.community-card {
+		display: flex;
+		align-items: center;
+		gap: 16px;
+		padding: 12px 0;
+		border-bottom: 1px solid #e0e0e0;
+		cursor: pointer;
+	}
+
+	.community-image-wrap {
+		flex-shrink: 0;
+		width: 60px;
+		height: 60px;
+		border-radius: 50%;
+		overflow: hidden;
+	}
+
+	.community-image-wrap img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+	}
+
+	.community-info {
+		flex: 1;
+	}
+
+	.community-name {
+		margin: 0;
+		font-size: 16px;
+		font-weight: 500;
+		color: #000;
+	}
+</style>
+<section class="community-section">
+	<button class="community-btn" (click)="router.navigate(['/addCommunity'])">Add Community</button>
+	<button class="community-btn" (click)="showJoin()">Join Community</button>
+</section>
+
+<style>
+	.community-section {
+		position: fixed;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		display: flex;
+		justify-content: center;
+		gap: 16px;
+		padding: 16px;
+		background: #fff;
+		box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.08);
+		z-index: 1000;
+	}
+
+	.search-input {
+		width: 100%;
+		margin: 0;
+		padding: 10px 14px;
+		padding-left: 36px;
+		border: 1px solid #ddd;
+		border-radius: 8px;
+		font-size: 14px;
+	}
+
+	.search-wrap {
+		position: relative;
+		width: calc(100% - 32px);
+		margin: 16px;
+	}
+
+	.search-icon {
+		position: absolute;
+		left: 12px;
+		top: 50%;
+		transform: translateY(-50%);
+		font-size: 14px;
+		color: #888;
+		pointer-events: none;
+	}
+
+	.community-btn {
+		background: rgb(255, 174, 0);
+		color: #000;
+		border: none;
+		border-radius: 8px;
+		padding: 12px 20px;
+		font-weight: 600;
+		cursor: pointer;
+	}
+
+	.qr-btn {
+		display: inline-flex;
+		align-items: center;
+		gap: 10px;
+		padding: 10px 14px;
+		border: 1px solid #e5e7eb;
+		border-radius: 12px;
+		background: #fff;
+		color: #111827;
+		font-weight: 600;
+		cursor: pointer;
+		box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+		transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+	}
+
+	.qr-btn:hover {
+		transform: translateY(-1px);
+		border-color: #d1d5db;
+		box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+	}
+
+	.qr-btn:active {
+		transform: translateY(0);
+		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+	}
+
+	.qr-btn-icon {
+		width: 40px;
+		height: 40px;
+		border-radius: 8px;
+		object-fit: cover;
+		background: #f9fafb;
+	}
+</style>

@@ -1,0 +1,115 @@
+<style>
+	.backColor{
+		border-color:red;
+	}
+</style>
+
+<div class="container-fluid min-vh-100 d-flex align-items-start justify-content-center bg-white py-3" style="font-family: Arial, sans-serif;">
+	<div class="w-100" style="max-width: 360px;">
+		<div class="text-center mb-4">
+			<h1 class="display-6 mb-4" style="font-family: Georgia, 'Times New Roman', serif; color: #1f4a75; letter-spacing: 0.5px;">Live the Journey</h1>
+
+			<img [src]="this.imageBase64()==''?'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=300&q=80':this.imageBase64()"
+					 alt="Profile"
+					 class="rounded-circle mx-auto d-block shadow-sm"
+					 style="width: 120px; height: 120px; object-fit: cover;" />
+
+			<input type="file" class="btn btn-light btn-sm mt-3 px-4 rounded-3 border" (change)="selectImage($event)">
+
+			<h2 class="mt-4 mb-4" style="font-family: 'Comic Sans MS', 'Segoe Print', cursive; font-size: 1.5rem; color: #222;">Welcome to Waybound Riders</h2>
+		</div>
+
+		<form [formGroup]="frm1" (ngSubmit)="frm1Submit()" >
+			<div class="mb-3">
+				@if(this.frm1.value.riderName=="" && this.frm1.get("riderName")?.touched){
+					<span><b style="color: red;">User name is mandator</b></span>
+				}
+					<input [ngClass]="{ 'backColor': frm1.value.riderName === '' && frm1.get('riderName')?.touched }" type="text" class="form-control form-control-lg text-center rounded-4" placeholder="Your name" formControlName="riderName" />
+			</div>
+			<div class="mb-3">
+				@if(this.frm1.value.riderPassword=="" && this.frm1.get("riderPassword")?.touched){
+					<span><b style="color: red;">Password is mandator</b></span>
+					<!-- <input type="password" class="form-control form-control-lg text-center rounded-4" style="color: red;" placeholder="Password" formControlName="riderPassword" />	 -->
+				}
+				<input [ngClass]="{ 'backColor': frm1.value.riderPassword === '' && frm1.get('riderPassword')?.touched }" type="password" class="form-control form-control-lg text-center rounded-4" placeholder="Password" formControlName="riderPassword" />
+			</div>
+			<div class="mb-3">
+				@if(this.frm1.value.riderEmail=="" && this.frm1.get("riderEmail")?.touched){
+					<span><b style="color: red;">Email is mandator</b></span>
+					<!-- <input type="email" class="form-control form-control-lg text-center rounded-4" placeholder="Email address" formControlName="riderEmail" />	 -->
+				}
+				<input [ngClass]="{ 'backColor': frm1.value.riderEmail === '' && frm1.get('riderEmail')?.touched }" type="email" class="form-control form-control-lg text-center rounded-4" placeholder="Email address" formControlName="riderEmail" />
+			</div>
+			<div class="mb-3">
+				@if(this.frm1.value.riderPhone=="" && this.frm1.get("riderPhone")?.touched){
+					<span><b style="color: red;">Phone is mandator</b></span>
+					<!-- <input type="tel" class="form-control form-control-lg text-center rounded-4" placeholder="Phone number" formControlName="riderPhone" />	 -->
+				}
+				<input [ngClass]="{ 'backColor': frm1.value.riderPhone === '' && frm1.get('riderPhone')?.touched }" type="tel" class="form-control form-control-lg text-center rounded-4" placeholder="Phone number" formControlName="riderPhone" />
+			</div>
+
+			<div class="row g-3 mb-3">
+				<div class="col-6">
+					@if(this.isAgeFalse()==true){
+						<span><b style="color: red;">Age is mandator</b></span>	
+					}
+				<select class="form-select form-select-lg text-center rounded-4" formControlName="riderAge" (change)="this.frm1.value.riderAge!='Your age'?this.isAgeFalse.set(false):this.isAgeFalse.set(true)">
+						<option disabled selected>Your age</option>
+						<option value="18-24">18-24</option>
+						<option value="25-34">25-34</option>
+						<option value="35-44">35-44</option>
+						<option value="45+">45+</option>
+					</select>
+				</div>
+				<div class="col-6">
+					@if(this.isGenderFalse()==true){
+						<span><b style="color: red;">Gender is mandator</b></span>	
+					}
+					<select class="form-select form-select-lg text-center rounded-4" formControlName="riderGender" aria-label="Gender" required (change)="this.frm1.value.riderGender!='Your gender'?this.isGenderFalse.set(false):this.isGenderFalse.set(true)">
+						<option disabled selected>Select gender</option>
+						<option value="Male">Male</option>
+						<option value="Female">Female</option>
+						<option value="Other">Other</option>
+						<option value="Prefer not to say">Prefer not to say</option>
+					</select>
+				</div>
+			</div>
+
+			<div class="mb-2">
+				@if(this.isNationFalse()==true){
+					<span><b style="color: red;">Nationality is mandator</b></span>	
+				}
+				<select class="form-select form-select-lg text-center rounded-4" formControlName="riderNationality" (change)="this.frm1.value.riderNationality!='Nationality'?this.isNationFalse.set(false):this.isNationFalse.set(true)">
+					<option selected disabled>Nationality</option>
+					<option value="Indian">Indian</option>
+					<option value="American">American</option>
+					<option value="British">British</option>
+					<option value="Other">Other</option>
+				</select>
+			</div>
+			<div class="text-center">
+				@if(this.Submitting()==true){
+					<button type="submit" class="btn btn-warning d-inline-flex align-items-center justify-content-center gap-2" style="width: 60%;height: 50px;font-size: 20px;" disabled>
+						<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+						<span>Loading...</span>
+					</button>
+				}
+				@else{
+					<button type="submit" class="btn btn-warning" style="width: 60%;height: 50px;font-size: 20px;">Submit</button>
+				}
+				<br>
+				<a href="#" class="small text-primary text-decoration-none d-inline-block mb-4">Terms &amp; Conditions</a>
+			</div>
+
+			<div class="form-check mb-2">
+				<input class="form-check-input" type="checkbox" id="joinCommunity" />
+				<label class="form-check-label small" for="joinCommunity">I want to join the Waybound Riders community.</label>
+			</div>
+
+			<div class="form-check">
+				<input class="form-check-input" type="checkbox" id="agreePolicy" />
+				<label class="form-check-label small" for="agreePolicy">I have read and agree to the Terms &amp; Conditions and Privacy Policy.</label>
+			</div>
+		</form>
+	</div>
+</div>
