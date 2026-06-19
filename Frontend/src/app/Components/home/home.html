@@ -5,13 +5,17 @@
 @if(qrState()==false && joinState()==false){
 <div class="communities-grid">
 	@for (c of this.communities(); track $index) {
-	<div class="community-card">
-		<div class="community-image-wrap">
-			<img [src]="c.communityImage" alt="{{c.communityName}}">
-		</div>
-		<div class="community-info">
-			<p class="community-name">{{c.communityName}}</p>
-		</div>
+	<div class="community-card" style="display: flex;justify-content: space-between;align-items: center;">
+		<button (click)="openCommunity(c._id)" style="background: none;border: none;padding: 0;display: flex;justify-content: center;align-items: center;flex: 1;">
+			<div style="display: flex;justify-content: center;align-items: center;width: 100%;">
+				<div class="community-image-wrap">
+					<img [src]="c.communityImage" alt="{{c.communityName}}">
+				</div>
+				<div class="community-info">
+					<p class="community-name">{{c.communityName}}</p>
+				</div>
+			</div>
+		</button>
 		<div>
 			<button class="qr-btn" type="button" (click)="setQr(c._id)">
 				<img class="qr-btn-icon" src="https://api.qrserver.com/v1/create-qr-code/?size=80x80&data=RoadBound"
@@ -20,6 +24,7 @@
 			</button>
 		</div>
 	</div>
+
 	}
 </div>
 }
@@ -38,32 +43,42 @@
 		<div class="qr-preview">
 			<qrcode [qrdata]="qr()" [width]="256"></qrcode>
 		</div>
+					<div class="qr-preview qr-code-container" style="display: flex;justify-content: center;align-items: center;gap: 8px;width: 100%;">
+						<p class="qr-code-text" style="margin: 0;">{{qr()}}</p>
+						<button class="copy-btn" type="button" (click)="copyToClipboard(qr())" title="Copy community code to clipboard" aria-label="Copy community code" style="border: none;background: none;display: flex;align-items: center;justify-content: center;">
+							<span class="copy-icon copy-icon-right" aria-hidden="true">📋</span>
+						</button>
+		</div>
 		<div class="qr-footer">
 			<span class="qr-hint">Point your camera at the code</span>
 		</div>
 	</div>
-	
+
 </div>
 }
 @if (joinState()) {
-	<div class="join-backdrop" (click)="stopJoin()"></div>
-	<div class="join-modal">
-		<div class="join-card">
-			<div class="join-header">
-				<div>
-					<p class="join-title">Join Community</p>
-					<p class="join-subtitle">Scan a community QR code to join</p>
-				</div>
-				<button class="join-close" type="button" (click)="stopJoin()">×</button>
+<div class="join-backdrop" (click)="stopJoin()"></div>
+<div class="join-modal">
+	<div class="join-card">
+		<div class="join-header">
+			<div>
+				<p class="join-title">Join Community</p>
+				<p class="join-subtitle">Scan a community QR code to join</p>
 			</div>
-
-			<div class="join-body">
-				<button class="scan-btn" type="button" (click)="startScanner()">Start Scanner</button>
-				<div id="reader" class="scanner-area"></div>
-				<div class="scanned-text">{{ scannedData() || 'No QR code scanned yet' }}</div>
-			</div>
+			<button class="join-close" type="button" (click)="stopJoin()">×</button>
 		</div>
+
+		<div class="join-body">
+			<button class="scan-btn" type="button" (click)="startScanner()">Start Scanner</button>
+			<div id="reader" class="scanner-area"></div>
+			<input type="text" class="community-id-input" placeholder="Enter community id" (change)="storeId()"
+				[(ngModel)]="id" [value]="scannedData()">
+			<!-- <div class="scanned-text">{{ scannedData() || 'No QR code scanned yet' }}</div> -->
+			<button class="btn btn-warning" (click)="joinCommunity()">Join community</button>
+		</div>
+
 	</div>
+</div>
 }
 <style>
 	.join-modal {
@@ -176,6 +191,24 @@
 		color: #334155;
 		font-size: 13px;
 		word-break: break-word;
+	}
+
+	.community-id-input {
+		width: 100%;
+		padding: 12px 14px;
+		border: 1px solid #cbd5e1;
+		border-radius: 14px;
+		background: #ffffff;
+		color: #0f172a;
+		font-size: 14px;
+		outline: none;
+		box-sizing: border-box;
+		transition: border-color 0.15s ease, box-shadow 0.15s ease;
+	}
+
+	.community-id-input:focus {
+		border-color: #fb7185;
+		box-shadow: 0 0 0 4px rgba(251, 113, 133, 0.12);
 	}
 
 	.join-backdrop {
