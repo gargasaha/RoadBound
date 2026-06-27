@@ -20,6 +20,9 @@ export class Home {
   joinState:WritableSignal<boolean>=signal(false);
   scannedData:WritableSignal<any>=signal('');
   id="";
+  searchKeywordS:WritableSignal<string>=signal('');
+  searchKeyword="";
+  searchTimeout: any;
   constructor(){
     if(localStorage.getItem("email")==null){
       this.router.navigate(['/login']);
@@ -28,6 +31,16 @@ export class Home {
       this.communities.set(x);
       // console.log(this.communities());
     })
+  }
+  setSearchKeyword() {
+    clearTimeout(this.searchTimeout);
+    this.searchTimeout = setTimeout(() => {
+      this.searchKeywordS.set(this.searchKeyword);
+      // console.log(this.searchKeywordS());
+      this.apiService.searchCommunityList(this.searchKeywordS()).subscribe((x:any)=>{
+        this.communities.set(x);
+      })
+    }, 2000);
   }
   setQr(id:any){
     this.qrState.set(true);
@@ -68,7 +81,21 @@ export class Home {
   );
   }
   joinCommunity(){
-    console.log(this.scannedData());
+    this.apiService.joinCommunity({'communityId':this.scannedData(),'riderEmail':localStorage.getItem('email')}).subscribe((x:any)=>{
+      if(x.message=='Rider Joined community'){
+        this.joinState.set(false);
+        this.apiService.getCommunityList().subscribe((x:any)=>{
+          this.communities.set(x);
+        })
+        // alert('Rider Joined community');
+      }
+      else if(x.message=='Rider already in community'){
+        alert('Rider already in community');
+      }
+      else if(x.message=='Community does not exists'){
+        alert('Community does not exists');
+      }
+    })
   }
   openCommunity(id:any){
     alert(id);

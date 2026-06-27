@@ -25,6 +25,28 @@ async function checkRider(req, res) {
         res.status(200).send({ message: 'Wrong email or password' });
     }
 }
+async function searchCommunityList(req,res){
+    // console.log(req.params);
+    const rider = await riderModel.findOne({
+        riderEmail: req.params.email
+    });
+
+    if (!rider) {
+        return res.status(404).json({
+            message: "Rider not found"
+        });
+    }
+
+    const memberships = await communityMemberModel.find({
+        riderId: rider._id,
+    }).populate("communityId");
+
+    const communities = memberships
+        .filter(item => item.communityId && item.communityId.communityName == req.params.keyword)
+        .map(item => item.communityId);
+
+    res.json(communities);
+}
 async function getCommunityList(req, res) {
     const rider = await riderModel.findOne({
         riderEmail: req.params.email
@@ -59,6 +81,35 @@ async function saveCommunity(req,res){
     await communityMemberModel.create(data);
     res.status(200).send({message:'Community saved'});
 }
+async function joinCommunity(req,res){
+    if (!mongoose.Types.ObjectId.isValid(req.body.communityId)) {
+        return res.status(200).send({ message: 'Community does not exists' });
+    }
 
+    let c = await communityModel.countDocuments({ _id: req.body.communityId });
+    if (c == 0) {
+        return res.status(200).send({ message: 'Community does not exists' });
+    }
 
-export default { saveRider, checkRider, getCommunityList,saveCommunity }
+    let rider = await riderModel.findOne({ riderEmail: req.body.riderEmail });
+    if (!rider) {
+        return res.status(200).send({ message: 'Rider not found' });
+    }
+    let riderId = rider._id.toString();
+    let count=await communityMemberModel.countDocuments({
+        riderId:riderId
+    });
+    if(count==0){
+        await communityMemberModel.create({
+            communityId:req.body.communityId,
+            riderId:riderId,
+            riderPosition:'Member'
+        });
+        res.status(200).send({message:'Rider Joined community'});
+    }
+    else{
+        res.status(200).send({message:'Rider already in community'});
+    }
+}   
+
+export default { saveRider, checkRider, getCommunityList,saveCommunity,joinCommunity,searchCommunityList }

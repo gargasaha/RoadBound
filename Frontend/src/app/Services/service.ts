@@ -35,6 +35,14 @@ export class Service {
       })
     )
   }
+  searchCommunityList(keyword:string):Observable<any>{
+    return this.http.get(this.backendDefaultUrl+"/searchCommunityList/"+localStorage.getItem('email')+'/'+keyword)
+    .pipe(
+      catchError((error)=>{
+        return throwError(()=>error);
+      })
+    )
+  }
   getCommunityList():Observable<any>{
     return this.http.get(this.backendDefaultUrl+"/getCommunityList/"+localStorage.getItem("email"))
     .pipe(
@@ -42,5 +50,13 @@ export class Service {
         return throwError(()=>error)
       })
     )
+  }
+  joinCommunity(data:any):Observable<any>{
+    return this.http.post(this.backendDefaultUrl+"/joinCommunity",data)
+    .pipe(
+      catchError((error)=>{
+        return throwError(()=>error)
+      })
+    );
   }
 }
