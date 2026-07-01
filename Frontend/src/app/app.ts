@@ -13,10 +13,19 @@ export class App {
   service=inject(Service);
   isLoggedIn:WritableSignal<boolean>=signal(false);
   router=inject(Router);
+  communityImage:WritableSignal<any>=signal('');
+  communityName:WritableSignal<any>=signal('');
   constructor(){
     if(localStorage.getItem("email")!=null){
       this.isLoggedIn.set(true);
     }
+  }
+  showCommunityInfo(){
+    this.service.getCommunity(localStorage.getItem('communityId')).subscribe((x:any)=>{
+      // console.log(x);
+      this.communityName.set(x[0].communityName);
+      this.communityImage.set(x[0].communityImage);
+    })
   }
   logout(){
     localStorage.clear();

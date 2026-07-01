@@ -3,6 +3,7 @@ import riderModel from "../Model/Rider.js";
 import communityModel from "../Model/Community.js";
 import communitymemberModel from "../Model/CommunityMember.js";
 import communityMemberModel from "../Model/CommunityMember.js";
+import chatModel from "../Model/Chat.js";
 async function saveRider(req, res) {
     let count = '';
     count = await riderModel.countDocuments({ riderEmail: req.body.riderEmail });
@@ -19,14 +20,18 @@ async function checkRider(req, res) {
     let count = await riderModel.countDocuments(
         { $and: [{ riderEmail: req.body.riderEmail }, { riderPassword: req.body.riderPassword }] })
     if (count > 0) {
-        res.status(200).send({ message: 'Logged in successfully' });
+        let riderId=await riderModel.findOne({
+            riderEmail: req.body.riderEmail,
+            riderPassword: req.body.riderPassword
+        })
+        riderId=riderId._id;
+        res.status(200).send({ message: 'Logged in successfully',riderId:riderId });
     }
     else {
         res.status(200).send({ message: 'Wrong email or password' });
     }
 }
 async function searchCommunityList(req,res){
-    // console.log(req.params);
     const rider = await riderModel.findOne({
         riderEmail: req.params.email
     });
@@ -42,7 +47,7 @@ async function searchCommunityList(req,res){
     }).populate("communityId");
 
     const communities = memberships
-        .filter(item => item.communityId && item.communityId.communityName == req.params.keyword)
+        .filter(item => item.communityId && item.communityId.communityName.toLowerCase().includes(req.params.keyword.toLowerCase()))
         .map(item => item.communityId);
 
     res.json(communities);
@@ -69,7 +74,6 @@ async function getCommunityList(req, res) {
     res.json(communities);
 }
 async function saveCommunity(req,res){
-    // console.log(req.body);
     let rider = await riderModel.findOne({ riderEmail: req.body.email });
     if (!rider) {
         return res.status(404).send({ message: 'Rider not found' });
@@ -97,7 +101,8 @@ async function joinCommunity(req,res){
     }
     let riderId = rider._id.toString();
     let count=await communityMemberModel.countDocuments({
-        riderId:riderId
+        riderId:riderId,
+        communityId:req.body.communityId
     });
     if(count==0){
         await communityMemberModel.create({
@@ -111,5 +116,25 @@ async function joinCommunity(req,res){
         res.status(200).send({message:'Rider already in community'});
     }
 }   
-
-export default { saveRider, checkRider, getCommunityList,saveCommunity,joinCommunity,searchCommunityList }
+async function getCommunity(req,res){
+    let data=await communityModel.find({
+        _id:req.params.communityId
+    });
+    res.status(200).send(data);
+}
+async function saveMessage(req,res){
+    await chatModel.create(req.body)
+    .then(()=>{
+        res.status(200).send({message:'Message saved'})
+    })
+    .catch((error)=>{
+        res.status(500).send({message:error});
+    })
+}
+async function getMessage(req,res){
+    const messages = await chatModel.find({
+        communityId: req.params.communityId
+    }).populate('riderId')
+    return res.status(200).send(messages);
+}
+export default { getMessage,saveMessage,getCommunity,saveRider, checkRider, getCommunityList,saveCommunity,joinCommunity,searchCommunityList }

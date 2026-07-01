@@ -1,0 +1,3 @@
+pages-register(user),register(community),login(user),default
+
+documents(tables)-rider,community,communitychat,ride

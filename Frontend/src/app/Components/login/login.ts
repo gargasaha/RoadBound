@@ -30,6 +30,7 @@ export class Login {
       this.apiService.checkRider(this.frm1.getRawValue()).subscribe((x)=>{
         if(x.message=="Logged in successfully"){
           localStorage.setItem("email",this.frm1.value.riderEmail as string);
+          localStorage.setItem("riderId",x.riderId);
           this.apiService.email.set(this.frm1.value.riderEmail as string);
           this.frm1.reset();
           this.btnState.set(false);

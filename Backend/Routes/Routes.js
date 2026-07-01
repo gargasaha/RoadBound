@@ -3,9 +3,11 @@ import roadBoundController from "../Controller/roadBoundController.js";
 const router=express.Router();
 router.post("/api/saveRider",roadBoundController.saveRider);
 router.post("/api/checkRider",roadBoundController.checkRider);
-router.get("/api/getCommunityList/:email",roadBoundController.getCommunityList);
-router.get("/api/searchCommunityList/:email/:keyword",roadBoundController.searchCommunityList);
 router.post("/api/saveCommunity",roadBoundController.saveCommunity);
 router.post("/api/joinCommunity",roadBoundController.joinCommunity);
-
+router.post("/api/saveMessage",roadBoundController.saveMessage);
+router.get("/api/getCommunityList/:email",roadBoundController.getCommunityList);
+router.get("/api/searchCommunityList/:email/:keyword",roadBoundController.searchCommunityList);
+router.get("/api/getCommunity/:communityId",roadBoundController.getCommunity);
+router.get("/api/getMessage/:communityId",roadBoundController.getMessage);
 export default router;

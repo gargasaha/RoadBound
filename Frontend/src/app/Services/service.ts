@@ -59,4 +59,28 @@ export class Service {
       })
     );
   }
+  getCommunity(communityId:any):Observable<any>{
+    return this.http.get(this.backendDefaultUrl+"/getCommunity/"+communityId)
+    .pipe(
+      catchError((error)=>{
+        return throwError(()=>{error})
+      })
+    );
+  }
+  saveMessage(data:any):Observable<any>{
+    return this.http.post(this.backendDefaultUrl+"/saveMessage",data)
+    .pipe(
+      catchError((error)=>{
+        return throwError(()=>error)
+      })
+    );
+  }
+  getMessage():Observable<any>{
+    return this.http.get(this.backendDefaultUrl+"/getMessage/"+localStorage.getItem('communityId'))
+    .pipe(
+      catchError((error)=>{
+        return throwError(()=>error);
+      })
+    );
+  }
 }

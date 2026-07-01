@@ -29,14 +29,17 @@ export class Home {
     }
     this.apiService.getCommunityList().subscribe((x:any)=>{
       this.communities.set(x);
-      // console.log(this.communities());
     })
   }
   setSearchKeyword() {
+    if(this.searchKeyword==''){
+      this.apiService.getCommunityList().subscribe((x:any)=>{
+        this.communities.set(x);
+      })
+    }
     clearTimeout(this.searchTimeout);
     this.searchTimeout = setTimeout(() => {
       this.searchKeywordS.set(this.searchKeyword);
-      // console.log(this.searchKeywordS());
       this.apiService.searchCommunityList(this.searchKeywordS()).subscribe((x:any)=>{
         this.communities.set(x);
       })
@@ -45,11 +48,9 @@ export class Home {
   setQr(id:any){
     this.qrState.set(true);
     this.qr.set(id);
-    // console.log(this.qr());
   }
   storeId(){
     this.scannedData.set(this.id);
-    // console.log(this.scannedData());
   }
   showJoin(){
     this.joinState.set(true);
@@ -78,7 +79,7 @@ export class Home {
       scanner.clear();
     },
     () => {}
-  );
+    );
   }
   joinCommunity(){
     this.apiService.joinCommunity({'communityId':this.scannedData(),'riderEmail':localStorage.getItem('email')}).subscribe((x:any)=>{
@@ -87,7 +88,6 @@ export class Home {
         this.apiService.getCommunityList().subscribe((x:any)=>{
           this.communities.set(x);
         })
-        // alert('Rider Joined community');
       }
       else if(x.message=='Rider already in community'){
         alert('Rider already in community');
@@ -98,7 +98,8 @@ export class Home {
     })
   }
   openCommunity(id:any){
-    alert(id);
+    localStorage.setItem('communityId',id);
+    this.router.navigate(['/communityHome']);
   }
 }
 
