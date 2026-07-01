@@ -23,6 +23,7 @@ export class Home {
   searchKeywordS:WritableSignal<string>=signal('');
   searchKeyword="";
   searchTimeout: any;
+  user:WritableSignal<string>=signal('');
   constructor(){
     if(localStorage.getItem("email")==null){
       this.router.navigate(['/login']);

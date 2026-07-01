@@ -15,8 +15,10 @@ export class App {
   router=inject(Router);
   communityImage:WritableSignal<any>=signal('');
   communityName:WritableSignal<any>=signal('');
+  user:WritableSignal<string>=signal('');
   constructor(){
     if(localStorage.getItem("email")!=null){
+      this.user.set(localStorage.getItem('email') as string);
       this.isLoggedIn.set(true);
     }
   }
