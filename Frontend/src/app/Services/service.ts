@@ -6,7 +6,7 @@ import { Observable,catchError,throwError } from 'rxjs';
   providedIn: 'root',
 })
 export class Service {
-  private backendDefaultUrl="http://10.213.125.206:3000/api";
+  private backendDefaultUrl="http://127.0.0.1:3000/api";
   http=inject(HttpClient);
   email:WritableSignal<string>=signal('');
   saveRider(data:any):Observable<any>{

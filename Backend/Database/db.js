@@ -1,6 +1,8 @@
 import mongoose from "mongoose";
+import dotenv from 'dotenv';
+dotenv.config();
 export async function conn(){
-    await mongoose.connect("mongodb://localhost:27017/RoadBound")
+    await mongoose.connect(process.env.DataBaseStr)
     .then(()=>{
         console.log("Database connected successfully");
     })
