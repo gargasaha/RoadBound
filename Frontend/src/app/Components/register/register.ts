@@ -14,6 +14,7 @@ export class Register {
   isAgeFalse:WritableSignal<boolean>=signal(false);
   isGenderFalse:WritableSignal<boolean>=signal(false);
   isNationFalse:WritableSignal<boolean>=signal(false);
+  
   httpService=inject(Service);
   router=inject(Router);
   Submitting:WritableSignal<boolean>=signal(false);
@@ -78,6 +79,7 @@ export class Register {
       else{
         localStorage.clear();
         localStorage.setItem("email",this.frm1.value.riderEmail as string);
+        localStorage.setItem("riderId",x._id);
         this.httpService.email.set(this.frm1.value.riderEmail as string);
         this.frm1.reset();
         this.router.navigate(['/'])

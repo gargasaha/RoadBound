@@ -12,8 +12,8 @@ async function saveRider(req, res) {
         return;
     }
     await riderModel.create(req.body)
-        .then(() => {
-            res.send({ message: "ok" });
+        .then((rider) => {
+            res.send({ message: "ok", _id: rider._id });
         })
 }
 async function checkRider(req, res) {
@@ -132,9 +132,31 @@ async function saveMessage(req,res){
     })
 }
 async function getMessage(req,res){
+    const clientCount = Number.parseInt(req.params.count, 10);
+    const count = await chatModel.countDocuments({
+        communityId: req.params.communityId
+    });
+
+    if (!Number.isInteger(clientCount) || count !== clientCount) {
+        const messages = await chatModel.find({
+            communityId: req.params.communityId
+        })
+        .populate('riderId')
+        .lean();
+
+        return res.status(200).send({ type: 1, messages });
+    }
+
+    return res.status(200).send({ type: 2 });
+}
+async function initMessageCount(req,res) {
     const messages = await chatModel.find({
         communityId: req.params.communityId
-    }).populate('riderId')
-    return res.status(200).send(messages);
+    })
+    .populate('riderId')
+    const count = await chatModel.countDocuments({
+        communityId:req.params.communityId
+    });
+    return res.status(200).send({messages,count});
 }
-export default { getMessage,saveMessage,getCommunity,saveRider, checkRider, getCommunityList,saveCommunity,joinCommunity,searchCommunityList }
+export default { getMessage,saveMessage,getCommunity,saveRider, checkRider, getCommunityList,saveCommunity,joinCommunity,searchCommunityList,initMessageCount }

@@ -8,6 +8,7 @@ import {
   ElementRef
 } from '@angular/core';
 import { Router } from '@angular/router';
+import { firstValueFrom } from 'rxjs';
 @Component({
   selector: 'app-community-home',
   imports: [FormsModule, NgClass],
@@ -30,18 +31,27 @@ export class CommunityHome {
   attachmentType:WritableSignal<string>=signal('');
   attachmentData:WritableSignal<any>=signal('');
   buttonLoadingState:WritableSignal<boolean>=signal(false);
+  isLoading:WritableSignal<boolean>=signal(false);
+  messageCount:WritableSignal<number>=signal(0);
+  private communityId = localStorage.getItem('communityId');
+  private riderIdValue = localStorage.getItem('riderId');
   constructor() {
     if(localStorage.getItem("email")==null){
       this.router.navigate(['/login']);
     }
-    this.getMessage();
-    if (localStorage.getItem('communityId') != null) {
+    if (this.communityId != null) {
       this.rootModule.showCommunityInfo();
     }
-    this.riderId.set(localStorage.getItem('riderId'));
+    this.riderId.set(this.riderIdValue);
+    void this.initMessageCount();
     this.i1=setInterval(()=>{
-      this.getMessage();
-    }, 2000);
+      void this.getMessage(this.messageCount());
+    }, 4000);
+  }
+  async initMessageCount(): Promise<void>{
+    const result:any = await firstValueFrom(this.apiService.initMessageCount(this.communityId));
+    this.messages.set(result.messages);
+    this.messageCount.set(result.count);
   }
   ngOnDestroy(){
     clearInterval(this.i1);
@@ -55,7 +65,6 @@ export class CommunityHome {
       return;
     }
     if(data.type=='image/png' || data.type=='image/jpg' || data.type=='image/jpeg'){
-      
       this.attachmentState.set(true);
       this.attachmentType.set('image');
       this.compressImage(data).then((compressed) => {
@@ -77,40 +86,38 @@ export class CommunityHome {
     this.attachmentData.set('');
   }
 
-  getMessage() {
-    this.apiService.getMessage().subscribe((x: any) => {
-      this.messages.set(x);
+  async getMessage(count:any): Promise<void> {
+    const result: any = await firstValueFrom(this.apiService.getMessage(count));
+    if(result.type==1){
+      this.messages.set(Array.isArray(result.messages) ? result.messages : []);
+      this.messageCount.set(result.count);
       this.i2=setTimeout(() => {
         this.scrollToBottom();
       }, 0);
-    })
+    }
   }
-  sendImage(){
+  async sendImage(){
     this.buttonLoadingState.set(true);
-    this.apiService.saveMessage({ communityId: localStorage.getItem('communityId'), riderId: localStorage.getItem('riderId'), messageType: 2, message: this.attachmentData() })
-      .subscribe((x: any) => {
-        this.message.set('');
-        this.getMessage();
-        this.buttonLoadingState.set(false);
-        this.attachmentState.set(false);
-      })
+    await firstValueFrom(this.apiService.saveMessage({ communityId: this.communityId, riderId: this.riderIdValue, messageType: 2, message: this.attachmentData() }));
+    this.message.set('');
+    void this.getMessage(this.messageCount());
+    this.buttonLoadingState.set(false);
+    this.attachmentState.set(false);
   }
-  sendVideo(){
+  async sendVideo(){
     this.buttonLoadingState.set(true);
-    this.apiService.saveMessage({ communityId: localStorage.getItem('communityId'), riderId: localStorage.getItem('riderId'), messageType: 3, message: this.attachmentData() })
-      .subscribe((x: any) => {
-        this.message.set('');
-        this.getMessage();
-        this.buttonLoadingState.set(false);
-        this.attachmentState.set(false);
-      })
+    await firstValueFrom(this.apiService.saveMessage({ communityId: this.communityId, riderId: this.riderIdValue, messageType: 3, message: this.attachmentData() }));
+    this.message.set('');
+    void this.getMessage(this.messageCount());
+    this.buttonLoadingState.set(false);
+    this.attachmentState.set(false);
   }
-  sendMessage() {
-    this.apiService.saveMessage({ communityId: localStorage.getItem('communityId'), riderId: localStorage.getItem('riderId'), messageType: 1, message: this.message() })
-      .subscribe((x: any) => {
-        this.message.set('');
-        this.getMessage();
-      })
+  async sendMessage() {
+    this.isLoading.set(true);
+    await firstValueFrom(this.apiService.saveMessage({ communityId: this.communityId, riderId: this.riderIdValue, messageType: 1, message: this.message() }));
+    this.isLoading.set(false);
+    this.message.set('');
+    void this.getMessage(this.messageCount());
   }
   scrollToBottom() {
     if (!this.chatContainer) return;

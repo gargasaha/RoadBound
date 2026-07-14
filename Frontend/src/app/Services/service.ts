@@ -6,7 +6,7 @@ import { Observable,catchError,throwError } from 'rxjs';
   providedIn: 'root',
 })
 export class Service {
-  private backendDefaultUrl="http://127.0.0.1:3000/api";
+  private backendDefaultUrl="http://10.213.125.206:3000/api";
   http=inject(HttpClient);
   email:WritableSignal<string>=signal('');
   saveRider(data:any):Observable<any>{
@@ -67,6 +67,14 @@ export class Service {
       })
     );
   }
+  initMessageCount(communityId:any):Observable<any>{
+    return this.http.get(this.backendDefaultUrl+"/initMessageCount/"+communityId)
+    .pipe(
+      catchError((error)=>{
+        return throwError(()=>{error})
+      })
+    );
+  }
   saveMessage(data:any):Observable<any>{
     return this.http.post(this.backendDefaultUrl+"/saveMessage",data)
     .pipe(
@@ -75,8 +83,8 @@ export class Service {
       })
     );
   }
-  getMessage():Observable<any>{
-    return this.http.get(this.backendDefaultUrl+"/getMessage/"+localStorage.getItem('communityId'))
+  getMessage(count:any):Observable<any>{
+    return this.http.get(this.backendDefaultUrl+"/getMessage/"+localStorage.getItem('communityId')+"/"+count)
     .pipe(
       catchError((error)=>{
         return throwError(()=>error);

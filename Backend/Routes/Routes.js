@@ -9,5 +9,6 @@ router.post("/api/saveMessage",roadBoundController.saveMessage);
 router.get("/api/getCommunityList/:email",roadBoundController.getCommunityList);
 router.get("/api/searchCommunityList/:email/:keyword",roadBoundController.searchCommunityList);
 router.get("/api/getCommunity/:communityId",roadBoundController.getCommunity);
-router.get("/api/getMessage/:communityId",roadBoundController.getMessage);
+router.get("/api/getMessage/:communityId/:count",roadBoundController.getMessage);
+router.get("/api/initMessageCount/:communityId",roadBoundController.initMessageCount);
 export default router;
