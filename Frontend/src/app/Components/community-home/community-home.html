@@ -1,4 +1,12 @@
 <div class="d-flex flex-column min-vh-100">
+    @if(isLoadingSymbolForChat()){
+    <section class="chat-loading-section d-flex align-items-center justify-content-center py-4 loading-fade-in border-bottom bg-white">
+        <div class="spinner-border text-warning" role="status" aria-label="Loading chat">
+            <span class="visually-hidden">Loading chat...</span>
+        </div>
+    </section>
+    }
+
     <div #chatContainer class="flex-grow-1 overflow-y-auto p-3" style="height: calc(100vh - 170px);">
         @for(msg of messages(); track $index){
 
@@ -53,6 +61,7 @@
             <button type="button" class="btn w-100 mt-3 rounded-pill fw-semibold shadow-sm py-2 border-0 text-dark"
             style="background: linear-gradient(90deg, #ffd84d 0%, #ff9f1c 100%);" (click)="sendImage()"
             disabled>
+            <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
             Sending..
             </button>
         }
@@ -78,12 +87,13 @@
             <button type="button" class="btn w-100 mt-3 rounded-pill fw-semibold shadow-sm py-2 border-0 text-dark"
             style="background: linear-gradient(90deg, #ffd84d 0%, #ff9f1c 100%);" (click)="sendVideo()"
             disabled>
+            <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
             Sending..
             </button>
         }
     </div>
     }
-    <section class="border-top bg-white p-3 mt-auto position-sticky bottom-0">
+    <section class="message-input-section border-top bg-white p-3 mt-auto position-sticky bottom-0">
         <div class="container">
             <div class="d-flex gap-2 align-items-center">
                 <input type="text" class="form-control rounded-pill px-3 py-2" placeholder="Type a message..."
@@ -110,17 +120,49 @@
             </div>
             <div class="d-flex gap-2 mt-3 justify-content-end">
                 <button class="btn btn-lg rounded-pill px-5 fw-semibold shadow border-0 text-dark"
-                    style="background: linear-gradient(90deg, #ffd84d 0%, #ff9f1c 100%);">
-                    Start ride
+                    style="background: linear-gradient(90deg, #ffd84d 0%, #ff9f1c 100%);" 
+                    (click)="startRide()">
+                    @if(isRideLive()){
+                        <span class="live-badge d-flex align-items-center gap-2">
+                            <img src="https://media.giphy.com/media/3oEjI6SIIHBdRxXI40/giphy.gif" alt="Live" style="width:20px; height:20px; object-fit:contain;" />
+                            <strong>Live</strong>
+                        </span>
+                    }@else{
+                        Start ride
+                    }
                 </button>
             </div>
         </div>
     </section>
 </div>
 <style>
+    .loading-fade-in {
+        animation: loadingFadeIn 0.35s ease-out both;
+    }
+
+    @keyframes loadingFadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(-6px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
     .chat-container {
         height: calc(100vh - 170px);
         overflow-y: auto;
+    }
+
+    .chat-loading-section {
+        min-height: 72px;
+    }
+
+    .message-input-section {
+        z-index: 1020;
     }
 
     .attachment-preview {

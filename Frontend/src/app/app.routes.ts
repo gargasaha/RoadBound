@@ -4,11 +4,13 @@ import { Home } from './Components/home/home';
 import { Login } from './Components/login/login';
 import { AddCommunity } from './Components/add-community/add-community';
 import { CommunityHome } from './Components/community-home/community-home';
+import { Ride } from './Components/ride/ride';
 
 export const routes: Routes = [
     {path:"register",component:Register},
     {path:"",component:Home},
     {path:"login",component:Login},
     {path:"addCommunity",component:AddCommunity},
-    {path:"communityHome",component:CommunityHome}
+    {path:"communityHome",component:CommunityHome},
+    {path:"ride",component:Ride}
 ];

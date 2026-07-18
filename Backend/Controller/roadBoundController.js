@@ -4,6 +4,7 @@ import communityModel from "../Model/Community.js";
 import communitymemberModel from "../Model/CommunityMember.js";
 import communityMemberModel from "../Model/CommunityMember.js";
 import chatModel from "../Model/Chat.js";
+import rideModel from "../Model/Ride.js";
 async function saveRider(req, res) {
     let count = '';
     count = await riderModel.countDocuments({ riderEmail: req.body.riderEmail });
@@ -144,7 +145,7 @@ async function getMessage(req,res){
         .populate('riderId')
         .lean();
 
-        return res.status(200).send({ type: 1, messages });
+        return res.status(200).send({ type: 1, messages,count });
     }
 
     return res.status(200).send({ type: 2 });
@@ -159,4 +160,17 @@ async function initMessageCount(req,res) {
     });
     return res.status(200).send({messages,count});
 }
-export default { getMessage,saveMessage,getCommunity,saveRider, checkRider, getCommunityList,saveCommunity,joinCommunity,searchCommunityList,initMessageCount }
+async function checkRideStatus(req,res){
+    const id=req.params.id;
+    const count=await rideModel.countDocuments({
+        communityId:id
+    });
+    console.log(count);
+    if(count==0){
+        res.status(200).send({message:false});
+    }
+    else{
+        res.status(200).send({message:true});
+    }
+}
+export default { checkRideStatus,getMessage,saveMessage,getCommunity,saveRider, checkRider, getCommunityList,saveCommunity,joinCommunity,searchCommunityList,initMessageCount }

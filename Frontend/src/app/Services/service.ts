@@ -6,7 +6,7 @@ import { Observable,catchError,throwError } from 'rxjs';
   providedIn: 'root',
 })
 export class Service {
-  private backendDefaultUrl="http://10.213.125.206:3000/api";
+  private backendDefaultUrl="https://5qdzkd13-3000.inc1.devtunnels.ms/api";
   http=inject(HttpClient);
   email:WritableSignal<string>=signal('');
   saveRider(data:any):Observable<any>{
@@ -18,6 +18,14 @@ export class Service {
         )
       })
     )
+  }
+  checkRideStatus(data:any):Observable<any>{
+    return this.http.get(this.backendDefaultUrl+"/checkRideStatus/"+data)
+    .pipe(
+      catchError((error)=>{
+        return throwError(()=>error)
+      })
+    );
   }
   checkRider(data:any):Observable<any>{
     return this.http.post(this.backendDefaultUrl+"/checkRider",data)

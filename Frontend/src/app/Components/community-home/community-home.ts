@@ -33,9 +33,12 @@ export class CommunityHome {
   buttonLoadingState:WritableSignal<boolean>=signal(false);
   isLoading:WritableSignal<boolean>=signal(false);
   messageCount:WritableSignal<number>=signal(0);
+  isLoadingSymbolForChat:WritableSignal<boolean>=signal(false);
+  isRideLive:WritableSignal<boolean>=signal(false);
   private communityId = localStorage.getItem('communityId');
   private riderIdValue = localStorage.getItem('riderId');
   constructor() {
+    this.isLoadingSymbolForChat.set(true);
     if(localStorage.getItem("email")==null){
       this.router.navigate(['/login']);
     }
@@ -43,19 +46,36 @@ export class CommunityHome {
       this.rootModule.showCommunityInfo();
     }
     this.riderId.set(this.riderIdValue);
-    void this.initMessageCount();
+    void this.initMessageCount().then(() => {
+      setTimeout(() => this.scrollToBottom(), 0);
+    });
     this.i1=setInterval(()=>{
-      void this.getMessage(this.messageCount());
+      this.getMessage(this.messageCount())
+      .then(()=>this.isLoadingSymbolForChat.set(false));
     }, 4000);
+    this.apiService.checkRideStatus(localStorage.getItem('communityId')).subscribe((x:any)=>{
+      if(x.message==true){
+        this.isRideLive.set(true);
+      }
+      else{
+        this.isRideLive.set(false);
+      }
+    })
   }
   async initMessageCount(): Promise<void>{
     const result:any = await firstValueFrom(this.apiService.initMessageCount(this.communityId));
     this.messages.set(result.messages);
     this.messageCount.set(result.count);
+    setTimeout(() => {
+      this.scrollToBottom();
+    }, 0);
   }
   ngOnDestroy(){
     clearInterval(this.i1);
     clearInterval(this.i2);
+  }
+  startRide():void{
+    this.router.navigate(['/ride']);
   }
   addAttachment(file:any){
     // this.buttonLoadingState.set(true);

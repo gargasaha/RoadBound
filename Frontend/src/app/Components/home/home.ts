@@ -19,16 +19,19 @@ export class Home {
   qr:WritableSignal<any>=signal('');
   joinState:WritableSignal<boolean>=signal(false);
   scannedData:WritableSignal<any>=signal('');
+  isLoadingSymbolForChat:WritableSignal<boolean>=signal(false);
   id="";
   searchKeywordS:WritableSignal<string>=signal('');
   searchKeyword="";
   searchTimeout: any;
 
   constructor(){
+    this.isLoadingSymbolForChat.set(true);
     if(localStorage.getItem("email")==null){
       this.router.navigate(['/login']);
     }
     this.apiService.getCommunityList().subscribe((x:any)=>{
+      this.isLoadingSymbolForChat.set(false);
       this.communities.set(x);
     })
   }

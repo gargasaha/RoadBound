@@ -2,6 +2,13 @@
 	<span class="search-icon">🔍</span>
 	<input type="search" class="search-input" placeholder="Search communities..." [(ngModel)]="searchKeyword" (input)="setSearchKeyword()" />
 </div>
+@if(isLoadingSymbolForChat()){
+    <section class="chat-loading-section d-flex align-items-center justify-content-center py-4 loading-fade-in border-bottom bg-white">
+        <div class="spinner-border text-warning" role="status" aria-label="Loading chat">
+            <span class="visually-hidden">Loading chat...</span>
+        </div>
+    </section>
+}
 @if(qrState()==false && joinState()==false){
 <div class="communities-grid">
 	@for (c of this.communities(); track $index) {
