@@ -173,4 +173,15 @@ async function checkRideStatus(req,res){
         res.status(200).send({message:true});
     }
 }
-export default { checkRideStatus,getMessage,saveMessage,getCommunity,saveRider, checkRider, getCommunityList,saveCommunity,joinCommunity,searchCommunityList,initMessageCount }
+async function isNewRide(req,res) {
+    const count=await rideModel.countDocuments({
+        communityId:req.params.id
+    });
+    if(count>0){
+        res.status(200).send({message:'Already in ride'});
+    }
+    else{
+        res.status(200).send({message:'In ride'});
+    }
+}
+export default { isNewRide,checkRideStatus,getMessage,saveMessage,getCommunity,saveRider, checkRider, getCommunityList,saveCommunity,joinCommunity,searchCommunityList,initMessageCount }

@@ -9,6 +9,16 @@ export class Service {
   private backendDefaultUrl="https://5qdzkd13-3000.inc1.devtunnels.ms/api";
   http=inject(HttpClient);
   email:WritableSignal<string>=signal('');
+  isNewRide(data:any):Observable<any>{
+    return this.http.get(this.backendDefaultUrl+"/isNewRide/"+data)
+    .pipe(
+      catchError((error)=>{
+        return throwError(()=>
+          error
+        )
+      })
+    )
+  }
   saveRider(data:any):Observable<any>{
     return this.http.post(this.backendDefaultUrl+"/saveRider",data)
     .pipe(

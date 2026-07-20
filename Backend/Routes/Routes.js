@@ -12,4 +12,6 @@ router.get("/api/getCommunity/:communityId",roadBoundController.getCommunity);
 router.get("/api/getMessage/:communityId/:count",roadBoundController.getMessage);
 router.get("/api/initMessageCount/:communityId",roadBoundController.initMessageCount);
 router.get("/api/checkRideStatus/:id",roadBoundController.checkRideStatus);
+router.get("/api/isNewRide/:id",roadBoundController.isNewRide);
+
 export default router;

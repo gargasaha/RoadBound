@@ -1,1 +1,57 @@
-<p>ride works!</p>
+@if (isNewRide()) {
+@if (isMapOpen()) {
+<div id="map">
+    
+</div>
+
+<button type="button" class="btn btn-danger position-fixed" style="top: 80px; right: 20px; z-index: 2000;" (click)="isMapOpen.set(false)">Close</button>
+
+<button type="button" class="btn btn-primary" style="position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 1000;" (click)="selectMyCurrentLocation()">Select my live location</button>
+} @else {
+<form [formGroup]="frm1" id="tripForm" class="container mt-4 p-4 border rounded shadow-sm bg-white">
+    <div class="mb-3">
+        <label for="tripName" class="form-label">Trip Name</label>
+        @if(this.frm1.value.tripName=="" && this.frm1.get('tripName')?.touched){
+            <input style="border-color: red;" type="text" class="form-control" placeholder="Enter trip name" required formControlName="tripName" />
+        }
+        @else{
+            <input type="text" class="form-control" placeholder="Enter trip name" required formControlName="tripName" />
+        }
+    </div>
+
+    <fieldset class="border rounded p-3 mb-3">
+        <legend class="float-none w-auto px-2 fs-6 mb-0">Trip Start Location</legend>
+
+        <div>
+            <button type="button" id="selectStartOnMap" class="btn btn-outline-primary" (click)="selectStartLocation()">
+                Select on Map
+            </button>
+        {{selectedStartLocation()}}
+        </div>
+    </fieldset>
+
+    <fieldset class="border rounded p-3 mb-3">
+        <legend class="float-none w-auto px-2 fs-6 mb-0">Trip End Location</legend>
+        <div class="mb-3">
+            <label for="endAddress" class="form-label">Address</label>
+            <input type="text" id="endAddress" name="endAddress" class="form-control" placeholder="End address" />
+        </div>
+        <div>
+            <button type="button" id="selectEndOnMap" class="btn btn-outline-primary">
+                Select on Map
+            </button>
+        </div>
+    </fieldset>
+
+    <div class="d-grid">
+        <button type="submit" class="btn btn-primary">Create Trip</button>
+    </div>
+</form>
+}
+}
+<style>
+    #map {
+        width: 100%;
+        height: 100vh;
+    }
+</style>

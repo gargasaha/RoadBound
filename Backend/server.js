@@ -8,7 +8,7 @@ const app=express();
 const server=http.createServer(app);
 const io=new Server(server);
 io.on("connection",(Socket)=>{
-    console.log(Socket.id);
+    // console.log(Socket.id);
 })
 
 app.use(express.json({ limit: '50mb' }));
