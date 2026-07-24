@@ -184,4 +184,14 @@ async function isNewRide(req,res) {
         res.status(200).send({message:'In ride'});
     }
 }
-export default { isNewRide,checkRideStatus,getMessage,saveMessage,getCommunity,saveRider, checkRider, getCommunityList,saveCommunity,joinCommunity,searchCommunityList,initMessageCount }
+async function startRide(req,res){
+    const currentDateTime = new Date();
+    req.body.data.rideStartTime = currentDateTime;
+    await rideModel.create(req.body)
+    .then(()=>{
+        res.status(200).send({message:'Started'});
+    })
+    .catch(error=>res.status(500).send({message:error}));
+    
+}
+export default { startRide,isNewRide,checkRideStatus,getMessage,saveMessage,getCommunity,saveRider, checkRider, getCommunityList,saveCommunity,joinCommunity,searchCommunityList,initMessageCount }

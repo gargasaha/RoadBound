@@ -109,4 +109,12 @@ export class Service {
       })
     );
   }
+  startRide(data:any):Observable<any>{
+    return this.http.post(this.backendDefaultUrl+"/startRide",data)
+    .pipe(
+      catchError((error)=>{
+        return throwError(()=>error)
+      })
+    );
+  }
 }

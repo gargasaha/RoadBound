@@ -6,6 +6,8 @@ router.post("/api/checkRider",roadBoundController.checkRider);
 router.post("/api/saveCommunity",roadBoundController.saveCommunity);
 router.post("/api/joinCommunity",roadBoundController.joinCommunity);
 router.post("/api/saveMessage",roadBoundController.saveMessage);
+router.post("/api/startRide",roadBoundController.startRide);
+
 router.get("/api/getCommunityList/:email",roadBoundController.getCommunityList);
 router.get("/api/searchCommunityList/:email/:keyword",roadBoundController.searchCommunityList);
 router.get("/api/getCommunity/:communityId",roadBoundController.getCommunity);

@@ -3,7 +3,7 @@
 <div id="map">
     
 </div>
-
+<label style="position: fixed; top: 80px; left: 50%; transform: translateX(-50%); z-index: 2000; background: rgba(255, 255, 255, 0.9); padding: 6px 12px; border-radius: 6px;">Drop your pin</label>
 <button type="button" class="btn btn-danger position-fixed" style="top: 80px; right: 20px; z-index: 2000;" (click)="isMapOpen.set(false)">Close</button>
 
 <button type="button" class="btn btn-primary" style="position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 1000;" (click)="selectMyCurrentLocation()">Select my live location</button>
@@ -32,19 +32,23 @@
 
     <fieldset class="border rounded p-3 mb-3">
         <legend class="float-none w-auto px-2 fs-6 mb-0">Trip End Location</legend>
-        <div class="mb-3">
-            <label for="endAddress" class="form-label">Address</label>
-            <input type="text" id="endAddress" name="endAddress" class="form-control" placeholder="End address" />
-        </div>
         <div>
-            <button type="button" id="selectEndOnMap" class="btn btn-outline-primary">
+            <button type="button" id="selectEndOnMap" class="btn btn-outline-primary" (click)="selectEndLocation()">
                 Select on Map
             </button>
+            {{selectedEndLocation()}}
         </div>
     </fieldset>
 
     <div class="d-grid">
-        <button type="submit" class="btn btn-primary">Create Trip</button>
+        @if(isSubmitting()){
+            <button type="button" class="btn btn-success" disabled>
+                <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                Starting Trip...
+            </button>
+        } @else {
+            <button type="submit" class="btn btn-success" (click)="submitRide()">Start Trip</button>
+        }
     </div>
 </form>
 }

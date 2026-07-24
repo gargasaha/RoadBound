@@ -22,8 +22,10 @@ export class Ride {
   isMapOpen: WritableSignal<boolean> = signal(false);
   currUrl: WritableSignal<SafeResourceUrl> = signal(this.sanitizer.bypassSecurityTrustResourceUrl('about:blank'));
   nm:WritableSignal<string>=signal("");
+  isSubmitting:WritableSignal<boolean>=signal(false);
   frm1 = new FormGroup({
-    rideStartTime: new FormControl<Date>(new Date(), Validators.required),
+    rideCommunityId:new FormControl<string>(localStorage.getItem('communityId') ?? "", Validators.required),
+    rideStartTime: new FormControl<string>("", Validators.required),
     rideEndTime: new FormControl<string>("", Validators.required),
     rideStartLat: new FormControl<string>("", Validators.required),
     rideStartLon: new FormControl<string>("", Validators.required),
@@ -66,10 +68,20 @@ export class Ride {
       }
     });
   }
-
   submitRide(): void {
+    if(!this.frm1.valid){
+      alert('All fields are required');
+      return;
+    }
+    this.isSubmitting.set(true);
+    this.apiService.startRide(this.frm1.getRawValue()).subscribe((x:any)=>{
+      this.isSubmitting.set(false);
+      
+      console.log(x);
+    })
   }
   selectedStartLocation:WritableSignal<string>=signal('');
+  selectedEndLocation:WritableSignal<string>=signal('');
   selectMyCurrentLocation(){
     navigator.geolocation.getCurrentPosition((position)=>{
       const lat=position.coords.latitude;
@@ -106,7 +118,6 @@ export class Ride {
       shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
       shadowSize: [41, 41],
     });
-
     if(this.map){
       this.map.remove();
     }
@@ -133,6 +144,18 @@ export class Ride {
       .addTo(this.map)
       .bindPopup("You")
       .openPopup()
+
+      fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`)
+        .then(response => response.json())
+        .then(data => {
+          const areaName = data.address?.village || data.address?.town || data.address?.city || 'Unknown Area';
+          const city = data.address?.city || data.address?.town || '';
+          const postcode = data.address?.postcode || '';
+          const state = data.address?.state || '';
+          const location = `${areaName}, ${city}, ${postcode}, ${state}`.replace(/,\s*,/g, ',').replace(/,\s*$/, '');
+          this.selectedStartLocation.set(location);
+        })
+        .catch(error => console.error('Geocoding error:', error));
 
       this.map.on('click',(e)=>{
 
@@ -165,20 +188,48 @@ export class Ride {
           .catch(error => console.error('Geocoding error:', error));
 
       });
-
     });
 
-    this.map.on('click',(e)=>{
+  });
 
-      const lat=e.latlng.lat;
-      const lng=e.latlng.lng;
+  }
+  selectEndLocation() { 
+    this.isMapOpen.set(true);
+    setTimeout(() => {
+    const customIcon = L.icon({
+      iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
+      iconSize: [25, 41],
+      iconAnchor: [12, 41],
+      popupAnchor: [1, -34],
+      shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+      shadowSize: [41, 41],
+    });
+    if(this.map){
+      this.map.remove();
+    }
 
-      if(this.marker){
-        this.map.removeLayer(this.marker);
-      }
+    navigator.geolocation.getCurrentPosition((position)=>{
 
-      this.marker=L.marker([lat,lng], { icon: customIcon }).addTo(this.map);
+      const lat=position.coords.latitude;
+      const lng=position.coords.longitude;
+      this.frm1.patchValue({
+          rideEndLat:lat.toString(),
+          rideEndLon:lng.toString()
+      });
 
+      this.map = L.map('map').setView([lat,lng],15);
+
+      L.tileLayer(
+        'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+        {
+          attribution:'© OpenStreetMap'
+        }
+      ).addTo(this.map);
+
+      L.marker([lat,lng], { icon: customIcon })
+      .addTo(this.map)
+      .bindPopup("You")
+      .openPopup()
 
       fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`)
         .then(response => response.json())
@@ -188,11 +239,41 @@ export class Ride {
           const postcode = data.address?.postcode || '';
           const state = data.address?.state || '';
           const location = `${areaName}, ${city}, ${postcode}, ${state}`.replace(/,\s*,/g, ',').replace(/,\s*$/, '');
-          console.log(data);
-          this.marker.bindPopup(location).openPopup();
+          this.selectedEndLocation.set(location);
         })
         .catch(error => console.error('Geocoding error:', error));
 
+      this.map.on('click',(e)=>{
+
+        const clickLat=e.latlng.lat;
+        const clickLng=e.latlng.lng;
+        this.frm1.patchValue({
+          rideEndLat:clickLat.toString(),
+          rideEndLon:clickLng.toString()
+        });
+        if(this.marker){
+          this.map.removeLayer(this.marker);
+        }
+
+        this.marker=L.marker([clickLat,clickLng], { icon: customIcon }).addTo(this.map);
+
+
+        fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${clickLat}&lon=${clickLng}`)
+          .then(response => response.json())
+          .then(data => {
+            const areaName = data.address?.village || data.address?.town || data.address?.city || 'Unknown Area';
+            const city = data.address?.city || data.address?.town || '';
+            const postcode = data.address?.postcode || '';
+            const state = data.address?.state || '';
+            const location = `${areaName}, ${city}, ${postcode}, ${state}`.replace(/,\s*,/g, ',').replace(/,\s*$/, '');
+            this.selectedEndLocation.set(location);
+            this.isMapOpen.set(false);
+            console.log(data);
+            this.marker.bindPopup(location).openPopup();
+          })
+          .catch(error => console.error('Geocoding error:', error));
+
+      });
     });
 
   });
