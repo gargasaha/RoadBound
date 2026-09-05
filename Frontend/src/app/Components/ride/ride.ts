@@ -33,14 +33,16 @@ export class Ride {
     rideEndLon: new FormControl<string>("", Validators.required),
     tripName: new FormControl<string>("", Validators.required)
   })
-  
-  ngOnInit(){
+  constructor(){
     this.apiService.isNewRide(localStorage.getItem("communityId")).subscribe((x: any) => {
       if (x.message === "Already in ride") {
         this.isNewRide.set(false);
         console.log(false);
       }
     })
+  }
+  ngOnInit(){
+    
   }
 
   private applyBounceToMarker(marker: L.Marker): void {
@@ -69,14 +71,16 @@ export class Ride {
     });
   }
   submitRide(): void {
-    if(!this.frm1.valid){
+    if(this.frm1.value.rideStartLat=='' || this.frm1.value.rideEndLat=='' || this.frm1.value.rideStartLon=='' || this.frm1.value.rideEndLon=='' || this.frm1.value.tripName==''){
+      console.log(this.frm1.getRawValue());
       alert('All fields are required');
       return;
     }
     this.isSubmitting.set(true);
     this.apiService.startRide(this.frm1.getRawValue()).subscribe((x:any)=>{
       this.isSubmitting.set(false);
-      
+      this.apiService.isRidingToHideNavBar.set(true);
+      this.isNewRide.set(false);
       console.log(x);
     })
   }

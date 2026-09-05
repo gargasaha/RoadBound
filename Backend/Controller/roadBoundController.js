@@ -186,7 +186,8 @@ async function isNewRide(req,res) {
 }
 async function startRide(req,res){
     const currentDateTime = new Date();
-    req.body.data.rideStartTime = currentDateTime;
+    // console.log(req.body);
+    req.body.rideStartTime = currentDateTime;
     await rideModel.create(req.body)
     .then(()=>{
         res.status(200).send({message:'Started'});

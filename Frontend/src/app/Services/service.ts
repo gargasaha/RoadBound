@@ -6,9 +6,10 @@ import { Observable,catchError,throwError } from 'rxjs';
   providedIn: 'root',
 })
 export class Service {
-  private backendDefaultUrl="https://5qdzkd13-3000.inc1.devtunnels.ms/api";
+  private backendDefaultUrl="https://ld4j0t1g-3000.inc1.devtunnels.ms/api";
   http=inject(HttpClient);
   email:WritableSignal<string>=signal('');
+  isRidingToHideNavBar:WritableSignal<boolean>=signal(false);
   isNewRide(data:any):Observable<any>{
     return this.http.get(this.backendDefaultUrl+"/isNewRide/"+data)
     .pipe(

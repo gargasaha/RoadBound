@@ -1,4 +1,5 @@
-<nav class="navbar navbar-expand-lg bg-warning fixed-top">
+@if(this.service.isRidingToHideNavBar()==false){
+  <nav class="navbar navbar-expand-lg bg-warning fixed-top">
   <div class="container-fluid">
     <a class="navbar-brand d-flex align-items-center" href="#">
       @if(this.communityImage()=='' && this.communityName()==''){
@@ -44,6 +45,8 @@
     </div>
   </div>
 </nav>
+}
+
 <!-- spacer to offset fixed navbar height -->
 <div style="height:64px;">&nbsp;</div>
 <router-outlet></router-outlet>
