@@ -1,21 +1,27 @@
 @if (isNewRide()) {
 @if (isMapOpen()) {
 <div id="map">
-    
-</div>
-<label style="position: fixed; top: 80px; left: 50%; transform: translateX(-50%); z-index: 2000; background: rgba(255, 255, 255, 0.9); padding: 6px 12px; border-radius: 6px;">Drop your pin</label>
-<button type="button" class="btn btn-danger position-fixed" style="top: 80px; right: 20px; z-index: 2000;" (click)="isMapOpen.set(false)">Close</button>
 
-<button type="button" class="btn btn-primary" style="position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 1000;" (click)="selectMyCurrentLocation()">Select my live location</button>
+</div>
+<label
+    style="position: fixed; top: 80px; left: 50%; transform: translateX(-50%); z-index: 2000; background: rgba(255, 255, 255, 0.9); padding: 6px 12px; border-radius: 6px;">Drop
+    your pin</label>
+<button type="button" class="btn btn-danger position-fixed" style="top: 80px; right: 20px; z-index: 2000;"
+    (click)="isMapOpen.set(false)">Close</button>
+
+<button type="button" class="btn btn-primary"
+    style="position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 1000;"
+    (click)="selectMyCurrentLocation()">Select my live location</button>
 } @else {
 <form [formGroup]="frm1" id="tripForm" class="container mt-4 p-4 border rounded shadow-sm bg-white">
     <div class="mb-3">
         <label for="tripName" class="form-label">Trip Name</label>
         @if(this.frm1.value.tripName=="" && this.frm1.get('tripName')?.touched){
-            <input style="border-color: red;" type="text" class="form-control" placeholder="Enter trip name" required formControlName="tripName" />
+        <input style="border-color: red;" type="text" class="form-control" placeholder="Enter trip name" required
+            formControlName="tripName" />
         }
         @else{
-            <input type="text" class="form-control" placeholder="Enter trip name" required formControlName="tripName" />
+        <input type="text" class="form-control" placeholder="Enter trip name" required formControlName="tripName" />
         }
     </div>
 
@@ -26,7 +32,7 @@
             <button type="button" id="selectStartOnMap" class="btn btn-outline-primary" (click)="selectStartLocation()">
                 Select on Map
             </button>
-        {{selectedStartLocation()}}
+            {{selectedStartLocation()}}
         </div>
     </fieldset>
 
@@ -39,15 +45,19 @@
             {{selectedEndLocation()}}
         </div>
     </fieldset>
-
+    <div class="d-grid">
+        @if (isDirection()) {
+        <div #mp id="mp"></div>
+        }
+    </div>
     <div class="d-grid">
         @if(isSubmitting()){
-            <button type="button" class="btn btn-success" disabled>
-                <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                Starting Trip...
-            </button>
+        <button type="button" class="btn btn-success" disabled>
+            <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+            Starting Trip...
+        </button>
         } @else {
-            <button type="submit" class="btn btn-success" (click)="submitRide()">Start Trip</button>
+        <button type="submit" class="btn btn-success" (click)="submitRide()">Start Trip</button>
         }
     </div>
 </form>
@@ -58,5 +68,9 @@
         width: 100%;
         height: 100vh;
     }
+
+    #mp {
+        width: 100%;
+        height: 500px;
+    }
 </style>
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCe1n0pMraCg_dNDDmiccrXOO7BXnCJAaA"></script>
